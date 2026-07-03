@@ -1,0 +1,385 @@
+/* style.css */
+/* Sistem Tema Glassmorphism Modern untuk IoT Rumah Pengering */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --bg-primary: #ffffff;
+    --bg-secondary: rgba(255, 255, 255, 0.7);
+    --border-glass: rgba(0, 0, 0, 0.08);
+    --text-glow: #0f172a;
+    --text-muted: #64748b;
+    
+    /* Neon Colors for Light Background */
+    --neon-green: #10b981;
+    --neon-blue: #0284c7;
+    --neon-red: #f43f5e;
+    --neon-orange: #ea580c;
+    --neon-purple: #7c3aed;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: #1e293b;
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* Glassmorphism Card Style */
+.glass-card {
+    background: var(--bg-secondary);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--border-glass);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.glass-card:hover {
+    border-color: rgba(0, 0, 0, 0.12);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.08);
+}
+
+/* Sidebar Styling */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 260px;
+    background: rgba(248, 250, 252, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid var(--border-glass);
+    z-index: 1000;
+    padding: 1.5rem 1rem;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-glass);
+    margin-bottom: 2rem;
+}
+
+.sidebar-brand h5 {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, var(--neon-blue), var(--neon-green));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sidebar-menu li a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-weight: 500;
+    transition: all 0.25s ease;
+}
+
+.sidebar-menu li a:hover, 
+.sidebar-menu li.active a {
+    color: var(--neon-blue);
+    background: rgba(2, 132, 199, 0.06);
+    border-left: 3px solid var(--neon-blue);
+    box-shadow: none;
+}
+
+.sidebar-menu li a i {
+    font-size: 1.25rem;
+    transition: transform 0.2s ease;
+}
+
+.sidebar-menu li a:hover i {
+    transform: scale(1.15);
+}
+
+/* Main Content Area */
+.main-wrapper {
+    margin-left: 260px;
+    padding: 2rem;
+    transition: margin-left 0.3s ease;
+}
+
+/* Top Navbar Styling */
+.top-navbar {
+    position: relative;
+    z-index: 1020; /* Ensure it sits above the main content cards stacking context */
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-glass);
+    border-radius: 16px;
+    padding: 0.8rem 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Responsive Sidebar Toggle */
+.menu-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* Device status indicator badge */
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.status-online {
+    background: rgba(0, 255, 170, 0.15);
+    color: var(--neon-green);
+    border: 1px solid rgba(0, 255, 170, 0.3);
+}
+
+.status-offline {
+    background: rgba(255, 60, 106, 0.15);
+    color: var(--neon-red);
+    border: 1px solid rgba(255, 60, 106, 0.3);
+}
+
+.status-pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-online .status-pulse {
+    background-color: var(--neon-green);
+    box-shadow: 0 0 8px var(--neon-green);
+    animation: pulseGlow 1.5s infinite;
+}
+
+.status-offline .status-pulse {
+    background-color: var(--neon-red);
+    box-shadow: 0 0 8px var(--neon-red);
+}
+
+@keyframes pulseGlow {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 170, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(0, 255, 170, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 170, 0); }
+}
+
+/* Values widgets styling */
+.widget-val {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -1px;
+    margin: 5px 0;
+    background: linear-gradient(135deg, #0f172a, #475569);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.widget-unit {
+    font-size: 1rem;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-left: 4px;
+    -webkit-text-fill-color: initial; /* Reset gradient */
+}
+
+/* Glassmorphism tables */
+.table-responsive {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-glass);
+}
+
+.custom-table {
+    margin-bottom: 0;
+    background: transparent !important;
+}
+
+.custom-table th {
+    background: rgba(0, 0, 0, 0.02) !important;
+    color: #0f172a !important;
+    border-bottom: 1px solid var(--border-glass) !important;
+    font-weight: 600;
+    padding: 14px;
+}
+
+.custom-table td {
+    background: transparent !important;
+    color: var(--text-muted) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+    padding: 14px;
+    vertical-align: middle;
+}
+
+.custom-table tr:hover td {
+    color: #0f172a !important;
+    background: rgba(0, 0, 0, 0.01) !important;
+}
+
+/* Image gallery custom styling */
+.gallery-item {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-glass);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.gallery-item:hover img {
+    transform: scale(1.08);
+}
+
+.gallery-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+    padding: 15px;
+    color: white;
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+/* Lightbox Modal Custom Glass */
+.modal-glass-content {
+    background: rgba(255, 255, 255, 0.96) !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    border: 1px solid var(--border-glass) !important;
+    border-radius: 20px !important;
+    color: #0f172a;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-glass) !important;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-glass) !important;
+}
+
+/* Form control styling for Glassmorphism */
+.glass-input {
+    background: rgba(0, 0, 0, 0.02) !important;
+    border: 1px solid var(--border-glass) !important;
+    color: #0f172a !important;
+    border-radius: 10px !important;
+    padding: 10px 14px !important;
+    transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+    background: rgba(0, 0, 0, 0.04) !important;
+    border-color: var(--neon-blue) !important;
+    box-shadow: 0 0 10px rgba(2, 132, 199, 0.15) !important;
+}
+
+/* Custom switch / checkbox */
+.form-check-input {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    border-color: var(--border-glass) !important;
+}
+
+.form-check-input:checked {
+    background-color: var(--neon-blue) !important;
+    border-color: var(--neon-blue) !important;
+    box-shadow: 0 0 8px rgba(2, 132, 199, 0.3) !important;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 991.98px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .sidebar.show {
+        transform: translateX(0);
+    }
+    
+    .main-wrapper {
+        margin-left: 0;
+        padding: 1rem;
+    }
+    
+    .menu-toggle {
+        display: block;
+    }
+}
+
+/* DataTables Styling Overrides */
+.dataTables_wrapper {
+    color: var(--text-muted) !important;
+}
+
+.dataTables_length select, .dataTables_filter input {
+    background: rgba(0, 0, 0, 0.02) !important;
+    border: 1px solid var(--border-glass) !important;
+    color: #0f172a !important;
+    border-radius: 8px !important;
+    padding: 6px 12px !important;
+}
+
+.page-link {
+    background-color: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid var(--border-glass) !important;
+    color: var(--text-muted) !important;
+}
+
+.page-item.active .page-link {
+    background-color: var(--neon-blue) !important;
+    border-color: var(--neon-blue) !important;
+    color: white !important;
+}
+
+.page-link:hover {
+    color: #0f172a !important;
+    background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Override text-white utility for light theme compatibility */
+.text-white {
+    color: #1e293b !important;
+}
