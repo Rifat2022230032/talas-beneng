@@ -61,7 +61,7 @@ try {
     <link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css" rel="stylesheet">
     
     <!-- Custom Style CSS -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=<?php echo filemtime('css/style.css'); ?>">
 </head>
 <body>
 
@@ -166,11 +166,16 @@ try {
                                     <td class="text-white"><?php echo number_format($row['sht_temperature'], 1); ?> °C</td>
                                     <td class="text-info fw-bold"><?php echo number_format($row['humidity'], 1); ?> %RH</td>
                                     <td>
-                                        <?php if ($row['exhaust'] == 1): ?>
-                                            <span class="badge bg-success text-dark px-3 py-1.5 fw-bold rounded-pill">AKTIF (ON)</span>
-                                        <?php else: ?>
-                                            <span class="badge bg-danger px-3 py-1.5 fw-bold rounded-pill">MATI (OFF)</span>
-                                        <?php endif; ?>
+                                        <div class="d-flex flex-wrap gap-1">
+                                            <?php for($i = 1; $i <= 4; $i++): 
+                                                $status = $row['exhaust_'.$i] ?? 0;
+                                                if ($status == 1): ?>
+                                                    <span class="badge bg-success text-dark px-2 py-1 fw-bold rounded-pill" style="font-size: 0.72rem;">E<?= $i ?>: ON</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-danger text-white px-2 py-1 fw-bold rounded-pill" style="font-size: 0.72rem;">E<?= $i ?>: OFF</span>
+                                                <?php endif; ?>
+                                            <?php endfor; ?>
+                                        </div>
                                     </td>
                                     <td><?php echo $row['wifi']; ?> dBm</td>
                                 </tr>
@@ -190,7 +195,7 @@ try {
     <!-- JQuery & Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=<?php echo filemtime('js/main.js'); ?>"></script>
 
     <!-- DataTables & Buttons Extension JS -->
     <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
@@ -236,7 +241,7 @@ try {
                     customize: function (doc) {
                         // Kustomisasi layout pdf
                         doc.content[1].table.widths = ['5%', '25%', '15%', '15%', '15%', '15%', '10%'];
-                        doc.styles.tableHeader.fillColor = '#101628';
+                        doc.styles.tableHeader.fillColor = '#1b4d30';
                         doc.styles.tableHeader.color = '#ffffff';
                         doc.styles.tableHeader.alignment = 'center';
                     }

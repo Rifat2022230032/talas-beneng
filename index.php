@@ -14,7 +14,7 @@ require_once 'config.php';
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Custom Style CSS -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=<?php echo filemtime('css/style.css'); ?>">
     <!-- SweetAlert2 -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 </head>
@@ -54,12 +54,34 @@ require_once 'config.php';
 
             <!-- Ilustrasi / Logo Sistem -->
             <div class="col-lg-5 text-center">
-                <div class="glass-card py-5 shadow-lg d-flex flex-column align-items-center justify-content-center" style="min-height: 380px;">
-                    <div class="position-relative mb-4">
-                        <i class="bi bi-cloud-sun text-info" style="font-size: 8rem; filter: drop-shadow(0 0 20px rgba(0, 210, 255, 0.4));"></i>
-                    </div>
-                    <h3 class="fw-bold m-0 text-white">Smart Drying IoT</h3>
-                    <p class="text-muted mt-2 px-4 small">Memonitor sirkulasi udara lembap secara cerdas untuk menghasilkan produk rajangan daun talas beneng kualitas ekspor.</p>
+                <div class="glass-card py-5 shadow-lg d-flex flex-column align-items-center justify-content-center" style="min-height: 380px; border-top: 4px solid var(--primary-leaf);">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150" width="160" height="160" class="leaf-glow" style="margin-bottom: 1.5rem;">
+                        <!-- Solar Dome Arc -->
+                        <path d="M15,120 A60,60 0 0,1 135,120" fill="none" stroke="var(--primary-leaf)" stroke-width="3" stroke-dasharray="6,4" opacity="0.6"/>
+                        <line x1="10" y1="120" x2="140" y2="120" stroke="var(--accent-brown)" stroke-width="4" stroke-linecap="round"/>
+                        
+                        <!-- Sun -->
+                        <circle cx="120" cy="35" r="14" fill="#ffb74d" opacity="0.9"/>
+                        <path d="M120,12 L120,20 M120,50 L120,58 M97,35 L105,35 M135,35 L143,35 M104,19 L110,25 M130,45 L136,51 M104,51 L110,45 M130,19 L136,25" stroke="#ffa726" stroke-width="2" stroke-linecap="round"/>
+
+                        <!-- Talas Leaf -->
+                        <g transform="translate(45, 45)">
+                            <path d="M30,5 C30,5 58,30 54,58 C50,76 30,82 30,82 C30,82 10,76 6,58 C2,30 30,5 30,5 Z" fill="var(--primary-leaf)" stroke="var(--primary-leaf-dark)" stroke-width="3" stroke-linejoin="round"/>
+                            <path d="M30,5 L30,82" stroke="var(--primary-leaf-dark)" stroke-width="2.5" stroke-linecap="round"/>
+                            <path d="M30,28 Q43,24 48,20" stroke="var(--primary-leaf-dark)" stroke-width="2" stroke-linecap="round" fill="none"/>
+                            <path d="M30,28 Q17,24 12,20" stroke="var(--primary-leaf-dark)" stroke-width="2" stroke-linecap="round" fill="none"/>
+                            <path d="M30,46 Q45,41 49,37" stroke="var(--primary-leaf-dark)" stroke-width="2" stroke-linecap="round" fill="none"/>
+                            <path d="M30,46 Q15,41 11,37" stroke="var(--primary-leaf-dark)" stroke-width="2" stroke-linecap="round" fill="none"/>
+                            <path d="M30,62 Q45,58 48,54" stroke="var(--primary-leaf-dark)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                            <path d="M30,62 Q15,58 12,54" stroke="var(--primary-leaf-dark)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                        </g>
+                        
+                        <!-- Wind / Air flow -->
+                        <path d="M25,85 Q40,75 50,85 T75,85" fill="none" stroke="var(--neon-blue)" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+                        <path d="M80,95 Q95,85 105,95 T130,95" fill="none" stroke="var(--neon-blue)" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+                    </svg>
+                    <h3 class="fw-bold m-0 text-white" style="color: var(--primary-leaf-dark) !important;">Smart Drying IoT</h3>
+                    <p class="text-muted mt-2 px-4 small" style="color: var(--text-muted) !important;">Memonitor sirkulasi udara lembap secara cerdas untuk menghasilkan produk rajangan daun talas beneng kualitas ekspor.</p>
                 </div>
             </div>
         </div>
@@ -111,13 +133,18 @@ require_once 'config.php';
             <!-- Card Status Exhaust -->
             <div class="col-md-4">
                 <div class="glass-card">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
+                    <div class="d-flex justify-content-between align-items-start w-100">
+                        <div class="w-100">
                             <span class="text-muted text-uppercase fw-semibold small">Status Kipas Exhaust</span>
-                            <h2 class="mt-2 fw-bold" id="homeExhaustText">-</h2>
-                        </div>
-                        <div class="p-3 bg-success bg-opacity-10 text-success rounded-3" id="homeExhaustIconContainer">
-                            <i class="bi bi-fan fs-2" id="homeExhaustIcon"></i>
+                            <div class="d-flex justify-content-between align-items-center mt-2 flex-wrap gap-1" id="homeExhaustList">
+                                <?php for($i = 1; $i <= 4; $i++): ?>
+                                <div class="d-flex flex-column align-items-center p-2 rounded bg-light bg-opacity-5 border border-light border-opacity-10" style="min-width: 58px; flex: 1;">
+                                    <span class="text-muted mb-1" style="font-size: 0.7rem; font-weight: 600;">EXH <?= $i ?></span>
+                                    <i class="bi bi-fan fs-4 text-secondary mb-1" id="homeExhaustIcon<?= $i ?>"></i>
+                                    <span class="badge bg-secondary px-1.5 py-0.5 rounded-pill" style="font-size: 0.6rem;" id="homeExhaustText<?= $i ?>">OFF</span>
+                                </div>
+                                <?php endfor; ?>
+                            </div>
                         </div>
                     </div>
                     <div class="mt-3 pt-3 border-top border-light border-opacity-10 d-flex justify-content-between small text-muted">
@@ -133,7 +160,7 @@ require_once 'config.php';
     <!-- Script JavaScript Bootstrap, Jquery, Sweetalert2, and AJAX -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=<?php echo filemtime('js/main.js'); ?>"></script>
 
     <script>
     // AJAX Fetch Data Terkini untuk Ringkasan Halaman Home
@@ -150,21 +177,20 @@ require_once 'config.php';
                     document.getElementById('homeHum').innerHTML = data.humidity.toFixed(1) + '<span class="widget-unit">%RH</span>';
                     document.getElementById('homeHumBatas').innerText = data.thresholds.hum_min + '% - ' + data.thresholds.hum_maks + '%';
 
-                    // Update Status Kipas Exhaust
-                    const exhaustText = document.getElementById('homeExhaustText');
-                    const exhaustIcon = document.getElementById('homeExhaustIcon');
-                    const exhaustContainer = document.getElementById('homeExhaustIconContainer');
-                    
-                    if (data.exhaust === 1) {
-                        exhaustText.innerText = 'MENYALA (ON)';
-                        exhaustText.className = 'mt-2 fw-bold text-success';
-                        exhaustIcon.className = 'bi bi-fan fs-2 spin-animation';
-                        exhaustContainer.className = 'p-3 bg-success bg-opacity-20 text-success rounded-3';
-                    } else {
-                        exhaustText.innerText = 'MATI (OFF)';
-                        exhaustText.className = 'mt-2 fw-bold text-danger';
-                        exhaustIcon.className = 'bi bi-fan fs-2';
-                        exhaustContainer.className = 'p-3 bg-danger bg-opacity-20 text-danger rounded-3';
+                    // Update Status Kipas Exhaust (4 Channels)
+                    for (let i = 1; i <= 4; i++) {
+                        const state = data[`exhaust_${i}`] ?? 0;
+                        const icon = document.getElementById(`homeExhaustIcon${i}`);
+                        const text = document.getElementById(`homeExhaustText${i}`);
+                        if (state === 1) {
+                            text.innerText = 'ON';
+                            text.className = 'badge bg-success text-dark px-1.5 py-0.5 rounded-pill';
+                            icon.className = 'bi bi-fan fs-4 text-success spin-animation';
+                        } else {
+                            text.innerText = 'OFF';
+                            text.className = 'badge bg-danger text-white px-1.5 py-0.5 rounded-pill';
+                            icon.className = 'bi bi-fan fs-4 text-danger';
+                        }
                     }
 
                     // Update Mode

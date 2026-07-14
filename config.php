@@ -54,17 +54,33 @@ function getSystemSettings() {
         'hum_min' => 50.0,
         'control_mode' => 'AUTO',
         'exhaust_control' => 'OFF',
+        'exhaust_1_control' => 'OFF',
+        'exhaust_2_control' => 'OFF',
+        'exhaust_3_control' => 'OFF',
+        'exhaust_4_control' => 'OFF',
         'wifi_ssid' => 'Kalyca',
-        'wifi_password' => 'Athifacantik'
+        'wifi_password' => 'Athifacantik',
+        'camera_status' => 'ON'
     ];
     try {
         $stmt = $pdo->query("SELECT key_name, value_val FROM settings");
         $db_keys = [];
+        $string_keys = [
+            'control_mode', 
+            'exhaust_control', 
+            'exhaust_1_control', 
+            'exhaust_2_control', 
+            'exhaust_3_control', 
+            'exhaust_4_control', 
+            'wifi_ssid', 
+            'wifi_password',
+            'camera_status'
+        ];
         while ($row = $stmt->fetch()) {
             $key = $row['key_name'];
             $val = $row['value_val'];
             $db_keys[] = $key;
-            if ($key === 'control_mode' || $key === 'exhaust_control' || $key === 'wifi_ssid' || $key === 'wifi_password') {
+            if (in_array($key, $string_keys)) {
                 $settings[$key] = $val;
             } else {
                 $settings[$key] = (float)$val;

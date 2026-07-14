@@ -80,6 +80,9 @@ bool isConnected = false;
 int frameCounter = 0;
 bool useSoftwareJpeg = false;
 
+// === Status kamera dari server (ON/OFF) ===
+bool cameraActive = true;  // Default aktif, bisa di-stop dari website
+
 // === BARU: Status pengiriman untuk retry mechanism ===
 volatile bool lastSendOk = false;   // Hasil callback terakhir
 volatile bool sendDone = false;     // Flag callback sudah dipanggil
@@ -341,6 +344,18 @@ bool uploadImageToWeb(const uint8_t *imageBuffer, size_t imageSize) {
         DeserializationError error = deserializeJson(doc, jsonBody);
         
         if (!error) {
+            // Cek camera_status dari server (ON/OFF)
+            if (doc.containsKey("camera_status")) {
+                String camStatus = doc["camera_status"].as<String>();
+                if (camStatus == "OFF") {
+                    cameraActive = false;
+                    Serial.println("[CAM] Server memerintahkan STOP kamera.");
+                } else {
+                    cameraActive = true;
+                    Serial.println("[CAM] Kamera AKTIF.");
+                }
+            }
+
             if (doc.containsKey("wifi_ssid") && doc.containsKey("wifi_password")) {
                 String new_ssid = doc["wifi_ssid"].as<String>();
                 String new_pass = doc["wifi_password"].as<String>();
@@ -541,9 +556,9 @@ void setup() {
     Serial.println("MASUKKAN MAC ADDRESS INI KE KODE PENERIMA!");
     Serial.println();
 
-    // Setup flash LED
+    // Setup flash LED - nyala terus
     pinMode(FLASH_GPIO_NUM, OUTPUT);
-    digitalWrite(FLASH_GPIO_NUM, LOW);
+    digitalWrite(FLASH_GPIO_NUM, HIGH);
 
     // Setup Kamera
     setupCamera();
@@ -556,6 +571,36 @@ void setup() {
 }
 
 // ==============================
+// === Fungsi cek status kamera dari server ===
+// ==============================
+void checkCameraStatusFromServer() {
+    if (WiFi.status() != WL_CONNECTED) return;
+
+    HTTPClient http;
+    String checkUrl = String(SERVER_URL);
+    // Ganti upload_photo.php menjadi camera_control.php
+    checkUrl.replace("upload_photo.php", "camera_control.php");
+    http.begin(checkUrl);
+    http.setTimeout(5000);
+
+    int httpCode = http.GET();
+    if (httpCode == 200) {
+        String payload = http.getString();
+        StaticJsonDocument<256> doc;
+        DeserializationError error = deserializeJson(doc, payload);
+        if (!error && doc.containsKey("camera_status")) {
+            String camStatus = doc["camera_status"].as<String>();
+            bool newState = (camStatus == "ON");
+            if (newState != cameraActive) {
+                cameraActive = newState;
+                Serial.printf("[CAM] Status diperbarui dari server: %s\n", cameraActive ? "AKTIF" : "STOP");
+            }
+        }
+    }
+    http.end();
+}
+
+// ==============================
 // Loop - Kirim Gambar Setiap 5 Detik
 // ==============================
 void loop() {
@@ -565,15 +610,20 @@ void loop() {
         return;
     }
 
-    // Nyalakan flash LED sebelum capture
+    // Jika kamera di-stop dari website, matikan flash & cek status dari server secara berkala
+    if (!cameraActive) {
+        digitalWrite(FLASH_GPIO_NUM, LOW); // Matikan flash saat tidak foto
+        Serial.println("[CAM] Kamera BERHENTI (di-stop dari website). Menunggu perintah aktif...");
+        checkCameraStatusFromServer();
+        delay(5000); // Cek ulang setiap 5 detik
+        return;
+    }
+
+    // Pastikan flash LED menyala saat kamera aktif
     digitalWrite(FLASH_GPIO_NUM, HIGH);
-    delay(150); // Beri waktu lampu menyala & sensor beradaptasi
 
     // Capture gambar
     camera_fb_t *fb = esp_camera_fb_get();
-    
-    // Matikan flash LED segera setelah capture
-    digitalWrite(FLASH_GPIO_NUM, LOW);
 
     if (!fb) {
         Serial.println("Gagal capture kamera");

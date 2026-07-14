@@ -299,6 +299,7 @@ bool prevRelay[4] = {false, false, false, false};
 int  prevMode = -1;
 int  prevStatus = -1;
 int  prevWarna = -1;
+unsigned long lastCommandTime = 0; // Waktu perintah terakhir dikirim ke sensor board
 
 // Debounce touch
 unsigned long lastTouchTime = 0;
@@ -466,12 +467,12 @@ void parseData(String data) {
     else if (key == "r")       sensorData.r       = val.toInt();
     else if (key == "g")       sensorData.g       = val.toInt();
     else if (key == "b")       sensorData.b       = val.toInt();
-    else if (key == "relay1")  sensorData.relay[0] = val.toInt() == 1;
-    else if (key == "relay2")  sensorData.relay[1] = val.toInt() == 1;
-    else if (key == "relay3")  sensorData.relay[2] = val.toInt() == 1;
-    else if (key == "relay4")  sensorData.relay[3] = val.toInt() == 1;
+    else if (key == "relay1")  { if (millis() - lastCommandTime > 2000) sensorData.relay[0] = val.toInt() == 1; }
+    else if (key == "relay2")  { if (millis() - lastCommandTime > 2000) sensorData.relay[1] = val.toInt() == 1; }
+    else if (key == "relay3")  { if (millis() - lastCommandTime > 2000) sensorData.relay[2] = val.toInt() == 1; }
+    else if (key == "relay4")  { if (millis() - lastCommandTime > 2000) sensorData.relay[3] = val.toInt() == 1; }
     else if (key == "status")  sensorData.status  = val.toInt();
-    else if (key == "mode")    sensorData.mode    = val.toInt();
+    else if (key == "mode")    { if (millis() - lastCommandTime > 2000) sensorData.mode    = val.toInt(); }
   }
 
   sensorData.dataReceived = true;
@@ -488,6 +489,7 @@ void parseData(String data) {
 // FUNGSI: Kirim perintah ke Sensor Board
 // ============================================================
 void sendCommand(String cmd) {
+  lastCommandTime = millis();
   SensorSerial.println("CMD:" + cmd);
 }
 

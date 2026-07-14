@@ -64,7 +64,8 @@ if (move_uploaded_file($file['tmp_name'], $targetPath)) {
         echo json_encode([
             "status" => "uploaded",
             "wifi_ssid" => $settings['wifi_ssid'],
-            "wifi_password" => $settings['wifi_password']
+            "wifi_password" => $settings['wifi_password'],
+            "camera_status" => isset($settings['camera_status']) ? $settings['camera_status'] : 'ON'
         ]);
     } catch (PDOException $e) {
         http_response_code(500);

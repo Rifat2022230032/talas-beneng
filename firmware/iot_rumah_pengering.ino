@@ -25,6 +25,9 @@
 #define DISPLAY_RX_PIN 16
 #define DISPLAY_TX_PIN 17
 
+// TCS34725 LED
+#define TCS_LED_PIN 13  // Kontrol LED Sensor TCS34725 (LOW = Mati, HIGH = Nyala)
+
 // ============================================
 // KONFIGURASI WIFI & SERVER IOT
 // ============================================
@@ -113,6 +116,7 @@ StatusWarna statusWarnaDaun = WARNA_TIDAK_DIKETAHUI;
 StatusSistem statusSistem = SISTEM_PROSES;
 bool tcsReady = false; // Flag sensor TCS34725 terdeteksi
 bool exhaustHumActive = false; // Status aktif exhaust berdasarkan kelembapan (histeresis)
+bool localSettingsDirty = false; // Flag untuk menandai perubahan lokal dari display touchscreen
 
 // Pin relay dalam array untuk kemudahan kontrol
 const int relayPins[4] = {RELAY_1_PIN, RELAY_2_PIN, RELAY_3_PIN, RELAY_4_PIN};
@@ -244,12 +248,18 @@ void parseCommand(String cmd) {
   cmd = cmd.substring(4); // Hapus "CMD:"
 
   if (cmd == "AUTO") {
-    mode = 0;
-    Serial.println("[Display CMD] Mode AUTO diaktifkan");
+    if (mode != 0) {
+      mode = 0;
+      localSettingsDirty = true;
+      Serial.println("[Display CMD] Mode AUTO diaktifkan");
+    }
   } 
   else if (cmd == "MANUAL") {
-    mode = 1;
-    Serial.println("[Display CMD] Mode MANUAL diaktifkan");
+    if (mode != 1) {
+      mode = 1;
+      localSettingsDirty = true;
+      Serial.println("[Display CMD] Mode MANUAL diaktifkan");
+    }
   } 
   else if (cmd.startsWith("R")) {
     // Format: R1:ON atau R1:OFF, R2:ON, dst.
@@ -263,10 +273,13 @@ void parseCommand(String cmd) {
     if (relayIdx >= 0 && relayIdx < 4) {
       bool newState = (stateStr == "ON");
       if (mode == 1) { // Hanya izinkan kontrol manual jika dalam mode MANUAL
-        relayState[relayIdx] = newState;
-        // Output ke pin relay langsung diperbarui
-        digitalWrite(relayPins[relayIdx], newState ? LOW : HIGH); // Active LOW
-        Serial.printf("[Display CMD] Relay %d diatur ke %s\n", relayIdx + 1, newState ? "ON" : "OFF");
+        if (relayState[relayIdx] != newState) {
+          relayState[relayIdx] = newState;
+          localSettingsDirty = true;
+          // Output ke pin relay langsung diperbarui
+          digitalWrite(relayPins[relayIdx], newState ? LOW : HIGH); // Active LOW
+          Serial.printf("[Display CMD] Relay %d diatur ke %s\n", relayIdx + 1, newState ? "ON" : "OFF");
+        }
       } else {
         Serial.println("[Display CMD] Command relay diabaikan (bukan mode MANUAL)");
       }
@@ -336,7 +349,7 @@ void checkWiFiConnection() {
 // ============================================
 // FUNGSI: Mengirim data sensor ke web API & Update Settings
 // ============================================
-void sendDataToServer(float tempDS, float humidityVal, float tempSHT, int exhaustVal, int wifiRSSI) {
+void sendDataToServer(float tempDS, float humidityVal, float tempSHT, bool e1, bool e2, bool e3, bool e4, int wifiRSSI, bool updateSettings) {
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("[IoT] Gagal mengirim data, WiFi tidak terhubung.");
     return;
@@ -347,12 +360,21 @@ void sendDataToServer(float tempDS, float humidityVal, float tempSHT, int exhaus
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");
   http.setTimeout(4000); // Timeout 4 detik
 
-  // Susun data POST
+  // Hitung exhaust global (logical OR dari keempat channel)
+  int exhaustVal = (e1 || e2 || e3 || e4) ? 1 : 0;
+
+  // Susun data POST dengan status per-channel dan mode kontrol
   String postData = "temperature=" + String(tempDS, 1) +
                     "&humidity=" + String(humidityVal, 1) +
                     "&sht_temperature=" + String(tempSHT, 1) +
                     "&exhaust=" + String(exhaustVal) +
-                    "&wifi=" + String(wifiRSSI);
+                    "&exhaust1=" + String(e1 ? 1 : 0) +
+                    "&exhaust2=" + String(e2 ? 1 : 0) +
+                    "&exhaust3=" + String(e3 ? 1 : 0) +
+                    "&exhaust4=" + String(e4 ? 1 : 0) +
+                    "&wifi=" + String(wifiRSSI) +
+                    "&control_mode=" + String(mode) +
+                    "&update_settings=" + String(updateSettings ? 1 : 0);
 
   Serial.println("[IoT] Mengirim data ke server: " + postData);
   int httpResponseCode = http.POST(postData);
@@ -361,10 +383,14 @@ void sendDataToServer(float tempDS, float humidityVal, float tempSHT, int exhaus
     Serial.printf("[IoT] Respon Server: %d\n", httpResponseCode);
     
     if (httpResponseCode == HTTP_CODE_OK) {
+      if (updateSettings) {
+        localSettingsDirty = false;
+        Serial.println("[IoT] Pengaturan lokal disinkronkan ke server successfully.");
+      }
       String response = http.getString();
       Serial.println("[IoT] Payload: " + response);
 
-      StaticJsonDocument<512> doc;
+      StaticJsonDocument<768> doc;
       DeserializationError error = deserializeJson(doc, response);
 
       if (!error) {
@@ -409,21 +435,17 @@ void sendDataToServer(float tempDS, float humidityVal, float tempSHT, int exhaus
           }
         }
 
-        // Baca Status Manual Exhaust (jika dalam mode MANUAL)
-        if (mode == 1 && doc.containsKey("exhaust_control")) {
-          int webExhaustState = doc["exhaust_control"];
-          bool newExhaustState = (webExhaustState == 1);
-          
-          // Sinkronisasikan semua relayState dengan input web
-          bool stateChanged = false;
+        // Baca Status Manual Exhaust per-channel (jika dalam mode MANUAL)
+        if (mode == 1) {
+          const char* exhaustKeys[4] = {"exhaust_1_control", "exhaust_2_control", "exhaust_3_control", "exhaust_4_control"};
           for (int i = 0; i < 4; i++) {
-            if (relayState[i] != newExhaustState) {
-              relayState[i] = newExhaustState;
-              stateChanged = true;
+            if (doc.containsKey(exhaustKeys[i])) {
+              bool newState = (doc[exhaustKeys[i]].as<int>() == 1);
+              if (relayState[i] != newState) {
+                relayState[i] = newState;
+                Serial.printf("[IoT] Exhaust %d diperbarui dari server ke: %s\n", i + 1, newState ? "ON" : "OFF");
+              }
             }
-          }
-          if (stateChanged) {
-             Serial.printf("[IoT] Status Exhaust MANUAL diperbarui dari server ke: %s\n", newExhaustState ? "ON" : "OFF");
           }
         }
       } else {
@@ -471,6 +493,11 @@ void setup() {
   }
   Serial.println("[OK]   Relay 4-Channel siap (semua OFF)");
 
+  // --- Inisialisasi LED TCS34725 ---
+  pinMode(TCS_LED_PIN, OUTPUT);
+  digitalWrite(TCS_LED_PIN, LOW); // Matikan LED sensor
+  Serial.println("[OK]   TCS34725 LED pin dikonfigurasi (Mati)");
+
   // --- Inisialisasi DS18B20 ---
   Serial.println("[INIT] DS18B20...");
   ds18b20.begin();
@@ -491,7 +518,8 @@ void setup() {
   Serial.println("[INIT] TCS34725...");
   if (tcs.begin()) {
     tcsReady = true;
-    Serial.println("[OK]   TCS34725 siap (0x29)");
+    tcs.setInterrupt(true); // Matikan LED onboard sensor TCS34725 (active low)
+    Serial.println("[OK]   TCS34725 siap (0x29), LED dimatikan");
   } else {
     tcsReady = false;
     Serial.println("[WARN] TCS34725 tidak terdeteksi!");
@@ -526,8 +554,9 @@ void loop() {
   // ---- 1. CEK KONEKSI WIFI (Non-blocking reconnect jika terputus) ----
   checkWiFiConnection();
 
-  // ---- TIMING MONITORING SENSOR (Setiap 5 Detik) ----
-  if (millis() - lastSensorReadTime >= sensorReadInterval) {
+  // ---- TIMING MONITORING SENSOR (Setiap 5 Detik atau ketika ada perubahan lokal dari display) ----
+  if (millis() - lastSensorReadTime >= sensorReadInterval || localSettingsDirty) {
+    bool isDirtySync = localSettingsDirty;
     lastSensorReadTime = millis();
 
     // ---- 1. BACA SENSOR SUHU & KELEMBAPAN ----
@@ -672,6 +701,6 @@ void loop() {
 
     // ---- 6. KIRIM DATA KE WEB SERVER IOT & UPDATE SETTINGS ----
     int wifiRSSI = (WiFi.status() == WL_CONNECTED) ? WiFi.RSSI() : -999;
-    sendDataToServer(suhuDS18B20, kelembapan, suhuSHT31, relayState[3] ? 1 : 0, wifiRSSI);
+    sendDataToServer(suhuDS18B20, kelembapan, suhuSHT31, relayState[0], relayState[1], relayState[2], relayState[3], wifiRSSI, isDirtySync);
   }
 }

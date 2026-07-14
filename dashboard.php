@@ -16,7 +16,7 @@ require_once 'config.php';
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Custom Style CSS -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=<?php echo filemtime('css/style.css'); ?>">
 </head>
 <body>
 
@@ -47,7 +47,7 @@ require_once 'config.php';
                             <span class="text-muted small text-uppercase fw-semibold">Suhu DS18B20</span>
                             <div class="widget-val" id="tempDS">-<span class="widget-unit">°C</span></div>
                         </div>
-                        <div class="p-3 bg-danger bg-opacity-10 text-danger rounded-3">
+                        <div class="p-3 rounded-3 d-flex align-items-center justify-content-center" style="background: rgba(198, 40, 40, 0.08) !important; color: var(--neon-red) !important; border: 1px solid rgba(198, 40, 40, 0.15); width: 50px; height: 50px;">
                             <i class="bi bi-thermometer-high fs-2"></i>
                         </div>
                     </div>
@@ -62,7 +62,7 @@ require_once 'config.php';
                             <span class="text-muted small text-uppercase fw-semibold">Kelembapan SHT31</span>
                             <div class="widget-val" id="humSHT">-<span class="widget-unit">%RH</span></div>
                         </div>
-                        <div class="p-3 bg-primary bg-opacity-10 text-primary rounded-3">
+                        <div class="p-3 rounded-3 d-flex align-items-center justify-content-center" style="background: rgba(45, 122, 77, 0.08) !important; color: var(--primary-leaf) !important; border: 1px solid rgba(45, 122, 77, 0.15); width: 50px; height: 50px;">
                             <i class="bi bi-droplet-half fs-2"></i>
                         </div>
                     </div>
@@ -77,7 +77,7 @@ require_once 'config.php';
                             <span class="text-muted small text-uppercase fw-semibold">Suhu SHT31</span>
                             <div class="widget-val" id="tempSHT">-<span class="widget-unit">°C</span></div>
                         </div>
-                        <div class="p-3 bg-warning bg-opacity-10 text-warning rounded-3">
+                        <div class="p-3 rounded-3 d-flex align-items-center justify-content-center" style="background: rgba(239, 108, 0, 0.08) !important; color: var(--neon-orange) !important; border: 1px solid rgba(239, 108, 0, 0.15); width: 50px; height: 50px;">
                             <i class="bi bi-thermometer-sun fs-2"></i>
                         </div>
                     </div>
@@ -92,7 +92,7 @@ require_once 'config.php';
                             <span class="text-muted small text-uppercase fw-semibold">WiFi RSSI</span>
                             <div class="widget-val" id="wifiRSSI">-<span class="widget-unit">dBm</span></div>
                         </div>
-                        <div class="p-3 bg-info bg-opacity-10 text-info rounded-3" id="wifiRSSIContainer">
+                        <div class="p-3 rounded-3 d-flex align-items-center justify-content-center" id="wifiRSSIContainer" style="background: rgba(0, 131, 143, 0.08) !important; color: var(--neon-blue) !important; border: 1px solid rgba(0, 131, 143, 0.15); width: 50px; height: 50px;">
                             <i class="bi bi-wifi fs-2" id="wifiRSSIIcon"></i>
                         </div>
                     </div>
@@ -100,38 +100,56 @@ require_once 'config.php';
             </div>
         </div>
 
-        <!-- Baris Kedua: Status Exhaust Relay -->
+        <!-- Baris Kedua: Status & Kontrol Kipas Exhaust -->
         <div class="row g-4 mb-4">
             <div class="col-12">
-                <div class="glass-card d-flex flex-wrap align-items-center justify-content-between gap-3">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="p-3 bg-light bg-opacity-5 rounded-3">
-                            <i class="bi bi-fan fs-3" id="exhaustFanLogo"></i>
+                <div class="glass-card">
+                    <!-- Header Section -->
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 border-bottom border-light border-opacity-10 pb-3 mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="p-3 bg-light bg-opacity-5 rounded-3 text-info">
+                                <i class="bi bi-fan fs-3" id="exhaustFanLogoMaster"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-semibold m-0 text-white">Status & Kontrol Kipas Exhaust</h5>
+                                <span class="text-muted small">Semua 4 channel relay digunakan untuk pembuangan sirkulasi udara lembap secara independen</span>
+                            </div>
                         </div>
-                        <div>
-                            <h5 class="fw-semibold m-0 text-white">Status Relay Kipas Exhaust</h5>
-                            <span class="text-muted small">Semua 4 channel relay digunakan untuk pembuangan sirkulasi udara lembap</span>
-                        </div>
-                    </div>
-                    
-                    <div class="d-flex align-items-center gap-3 flex-wrap">
-                        <!-- Indikator 🟢 / 🔴 -->
-                        <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-pill shadow-inner" id="exhaustStatusContainer" style="background: rgba(0,0,0,0.03); border: 1px solid var(--border-glass);">
-                            <span class="status-pulse" id="exhaustPulse" style="width:12px; height:12px;"></span>
-                            <strong class="text-uppercase small" id="exhaustStatusText">Checking</strong>
-                        </div>
-
+                        
                         <!-- Mode Kontrol Toggle -->
-                        <div class="form-check form-switch m-0 ps-5 d-flex align-items-center gap-2 border-start border-secondary border-opacity-25 ms-2">
+                        <div class="form-check form-switch m-0 ps-5 d-flex align-items-center gap-2 bg-light bg-opacity-5 px-4 py-2 rounded-pill border border-light border-opacity-10 shadow-sm">
                             <input class="form-check-input" type="checkbox" role="switch" id="controlModeToggle" style="width: 2.5em; height: 1.25em;">
                             <label class="form-check-label fw-semibold text-white small" for="controlModeToggle" id="controlModeLabel">Mode: AUTO</label>
                         </div>
-
-                        <!-- Exhaust Toggle (hanya aktif jika mode MANUAL) -->
-                        <div class="form-check form-switch m-0 ps-5 d-flex align-items-center gap-2 border-start border-secondary border-opacity-25 ms-2" id="manualExhaustWrapper">
-                            <input class="form-check-input" type="checkbox" role="switch" id="exhaustControlToggle" style="width: 2.5em; height: 1.25em;" disabled>
-                            <label class="form-check-label fw-semibold text-white small" for="exhaustControlToggle" id="exhaustControlLabel">Exhaust: OFF</label>
+                    </div>
+                    
+                    <!-- 4 Channel Grid -->
+                    <div class="row g-3">
+                        <?php for($i = 1; $i <= 4; $i++): ?>
+                        <div class="col-6 col-md-3">
+                            <div class="p-3 rounded-3 shadow-sm border border-light border-opacity-10 d-flex flex-column gap-3" style="background: rgba(255,255,255,0.02)">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="fw-bold text-white mb-1">Exhaust <?= $i ?></h6>
+                                        <!-- Indikator status real-time alat -->
+                                        <div class="d-flex align-items-center gap-1.5 mt-1">
+                                            <span class="status-pulse" id="exhaustPulse<?= $i ?>" style="width:8px; height:8px;"></span>
+                                            <span class="small fw-semibold text-uppercase" id="exhaustStatusText<?= $i ?>">Checking</span>
+                                        </div>
+                                    </div>
+                                    <div class="p-2 bg-light bg-opacity-5 text-secondary rounded-2" id="exhaustLogoContainer<?= $i ?>">
+                                        <i class="bi bi-fan fs-4" id="exhaustLogo<?= $i ?>"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Slider Kontrol (hanya aktif jika mode MANUAL) -->
+                                <div class="form-check form-switch m-0 d-flex align-items-center justify-content-between p-0 border-top border-light border-opacity-10 pt-3">
+                                    <span class="small fw-medium text-muted">Kontrol Manual</span>
+                                    <input class="form-check-input m-0" type="checkbox" role="switch" id="exhaustControlToggle<?= $i ?>" style="width: 2.2em; height: 1.15em;" disabled>
+                                </div>
+                            </div>
                         </div>
+                        <?php endfor; ?>
                     </div>
                 </div>
             </div>
@@ -168,7 +186,7 @@ require_once 'config.php';
 
     <!-- Script JavaScript Bootstrap, Jquery, Sweetalert2, and AJAX -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=<?php echo filemtime('js/main.js'); ?>"></script>
 
     <script>
     let tempChartInstance = null;
@@ -180,8 +198,8 @@ require_once 'config.php';
         const ctxHum = document.getElementById('humidityChart').getContext('2d');
 
         // Style Chart global styling
-        Chart.defaults.color = '#8c9bb4';
-        Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.05)';
+        Chart.defaults.color = '#5c6f62';
+        Chart.defaults.borderColor = 'rgba(45, 122, 77, 0.06)';
 
         tempChartInstance = new Chart(ctxTemp, {
             type: 'line',
@@ -191,8 +209,8 @@ require_once 'config.php';
                     {
                         label: 'Suhu DS18B20',
                         data: [],
-                        borderColor: '#ff3c6a',
-                        backgroundColor: 'rgba(255, 60, 106, 0.05)',
+                        borderColor: '#c62828',
+                        backgroundColor: 'rgba(198, 40, 40, 0.04)',
                         borderWidth: 3,
                         tension: 0.4,
                         fill: true
@@ -200,8 +218,8 @@ require_once 'config.php';
                     {
                         label: 'Suhu SHT31',
                         data: [],
-                        borderColor: '#ff9900',
-                        backgroundColor: 'rgba(255, 153, 0, 0.05)',
+                        borderColor: '#ef6c00',
+                        backgroundColor: 'rgba(239, 108, 0, 0.04)',
                         borderWidth: 2,
                         borderDash: [5, 5],
                         tension: 0.4,
@@ -232,8 +250,8 @@ require_once 'config.php';
                     {
                         label: 'Kelembapan SHT31',
                         data: [],
-                        borderColor: '#00d2ff',
-                        backgroundColor: 'rgba(0, 210, 255, 0.1)',
+                        borderColor: '#2d7a4d',
+                        backgroundColor: 'rgba(45, 122, 77, 0.08)',
                         borderWidth: 3,
                         tension: 0.4,
                         fill: true
@@ -282,25 +300,63 @@ require_once 'config.php';
                         wifiIcon.className = "bi bi-wifi-1bar fs-2 text-danger";
                     }
 
-                    // Update Status Relay Exhaust
-                    const statusText = document.getElementById('exhaustStatusText');
-                    const pulse = document.getElementById('exhaustPulse');
-                    const exhaustLogo = document.getElementById('exhaustFanLogo');
-                    
-                    if (data.exhaust === 1) {
-                        statusText.innerText = "EXHAUST ON 🟢";
-                        statusText.className = "text-success small";
-                        pulse.style.backgroundColor = "var(--neon-green)";
-                        pulse.style.boxShadow = "0 0 10px var(--neon-green)";
-                        pulse.className = "status-pulse active-pulse";
-                        exhaustLogo.className = "bi bi-fan fs-3 text-success spin-animation";
+                    // Update Status Relay Exhaust (4 Channels)
+                    let anyExhaustOn = false;
+                    for (let i = 1; i <= 4; i++) {
+                        const statusText = document.getElementById(`exhaustStatusText${i}`);
+                        const pulse = document.getElementById(`exhaustPulse${i}`);
+                        const exhaustLogo = document.getElementById(`exhaustLogo${i}`);
+                        const container = document.getElementById(`exhaustLogoContainer${i}`);
+                        const state = data[`exhaust_${i}`] ?? 0;
+
+                        if (state === 1) {
+                            anyExhaustOn = true;
+                            statusText.innerText = "ON 🟢";
+                            statusText.className = "text-success small";
+                            pulse.style.backgroundColor = "var(--neon-green)";
+                            pulse.style.boxShadow = "0 0 10px var(--neon-green)";
+                            pulse.className = "status-pulse active-pulse";
+                            exhaustLogo.className = "bi bi-fan fs-4 text-success spin-animation";
+                            container.className = "p-2 bg-success bg-opacity-10 rounded-2";
+                        } else {
+                            statusText.innerText = "OFF 🔴";
+                            statusText.className = "text-danger small";
+                            pulse.style.backgroundColor = "var(--neon-red)";
+                            pulse.style.boxShadow = "0 0 10px var(--neon-red)";
+                            pulse.className = "status-pulse";
+                            exhaustLogo.className = "bi bi-fan fs-4 text-danger";
+                            container.className = "p-2 bg-danger bg-opacity-10 rounded-2";
+                        }
+                    }
+
+                    // Update Master logo spin animation
+                    const masterLogo = document.getElementById('exhaustFanLogoMaster');
+                    if (anyExhaustOn) {
+                        masterLogo.className = "bi bi-fan fs-3 text-info spin-animation";
                     } else {
-                        statusText.innerText = "EXHAUST OFF 🔴";
-                        statusText.className = "text-danger small";
-                        pulse.style.backgroundColor = "var(--neon-red)";
-                        pulse.style.boxShadow = "0 0 10px var(--neon-red)";
-                        pulse.className = "status-pulse";
-                        exhaustLogo.className = "bi bi-fan fs-3 text-secondary";
+                        masterLogo.className = "bi bi-fan fs-3 text-secondary";
+                    }
+
+                    // Update Mode Toggle & Sliders dynamically from settings
+                    const controlModeToggle = document.getElementById('controlModeToggle');
+                    const controlModeLabel = document.getElementById('controlModeLabel');
+                    const isManual = (data.mode === 1);
+
+                    // Update mode toggle check state if the user is not currently focusing it
+                    if (controlModeToggle && document.activeElement !== controlModeToggle) {
+                        controlModeToggle.checked = isManual;
+                        controlModeLabel.innerText = isManual ? "Mode: MANUAL" : "Mode: AUTO";
+                    }
+
+                    // Update exhaust manual slider toggles
+                    for (let i = 1; i <= 4; i++) {
+                        const toggle = document.getElementById(`exhaustControlToggle${i}`);
+                        if (toggle) {
+                            toggle.disabled = !isManual;
+                            if (document.activeElement !== toggle) {
+                                toggle.checked = (data[`exhaust_${i}_control`] === 1);
+                            }
+                        }
                     }
                 }
             })
@@ -341,8 +397,12 @@ require_once 'config.php';
         // Control Manual Logic
         const controlModeToggle = document.getElementById('controlModeToggle');
         const controlModeLabel = document.getElementById('controlModeLabel');
-        const exhaustControlToggle = document.getElementById('exhaustControlToggle');
-        const exhaustControlLabel = document.getElementById('exhaustControlLabel');
+        
+        // References to 4 sliders
+        const exhaustToggles = {};
+        for (let i = 1; i <= 4; i++) {
+            exhaustToggles[i] = document.getElementById(`exhaustControlToggle${i}`);
+        }
 
         function loadControlModeState() {
             fetch('api/get_settings.php')
@@ -351,14 +411,15 @@ require_once 'config.php';
                     if (result.status === 'success') {
                         const settings = result.data;
                         const isManual = (settings.control_mode === 'MANUAL');
-                        const isExhaustOn = (settings.exhaust_control === 'ON');
 
                         controlModeToggle.checked = isManual;
                         controlModeLabel.innerText = isManual ? "Mode: MANUAL" : "Mode: AUTO";
 
-                        exhaustControlToggle.disabled = !isManual;
-                        exhaustControlToggle.checked = isExhaustOn;
-                        exhaustControlLabel.innerText = isExhaustOn ? "Exhaust: ON" : "Exhaust: OFF";
+                        for (let i = 1; i <= 4; i++) {
+                            const isExhaustOn = (settings[`exhaust_${i}_control`] === 'ON');
+                            exhaustToggles[i].disabled = !isManual;
+                            exhaustToggles[i].checked = isExhaustOn;
+                        }
                     }
                 })
                 .catch(err => console.error("Error loading control mode settings:", err));
@@ -368,7 +429,9 @@ require_once 'config.php';
             const mode = this.checked ? 'MANUAL' : 'AUTO';
             controlModeLabel.innerText = this.checked ? "Mode: MANUAL" : "Mode: AUTO";
             
-            exhaustControlToggle.disabled = !this.checked;
+            for (let i = 1; i <= 4; i++) {
+                exhaustToggles[i].disabled = !this.checked;
+            }
 
             const formData = new FormData();
             formData.append('control_mode', mode);
@@ -386,25 +449,33 @@ require_once 'config.php';
             .catch(err => console.error("Error saving control mode:", err));
         });
 
-        exhaustControlToggle.addEventListener('change', function() {
-            const state = this.checked ? 'ON' : 'OFF';
-            exhaustControlLabel.innerText = this.checked ? "Exhaust: ON" : "Exhaust: OFF";
-
-            const formData = new FormData();
-            formData.append('exhaust_control', state);
-            
-            fetch('api/save_control.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status !== 'success') {
-                    alert("Gagal mengubah status kipas: " + data.message);
-                }
-            })
-            .catch(err => console.error("Error saving exhaust state:", err));
-        });
+        // Add event listeners to each of the 4 sliders
+        for (let i = 1; i <= 4; i++) {
+            exhaustToggles[i].addEventListener('change', function() {
+                const state = this.checked ? 'ON' : 'OFF';
+                
+                const formData = new FormData();
+                formData.append('exhaust_id', i);
+                formData.append('state', state);
+                
+                fetch('api/save_control.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status !== 'success') {
+                        alert(`Gagal mengubah status Kipas Exhaust ${i}: ` + data.message);
+                        // Revert checkbox state
+                        this.checked = !this.checked;
+                    }
+                })
+                .catch(err => {
+                    console.error(`Error saving exhaust ${i} state:`, err);
+                    this.checked = !this.checked;
+                });
+            });
+        }
 
         loadControlModeState();
 

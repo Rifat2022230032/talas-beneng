@@ -19,7 +19,7 @@ $settings = getSystemSettings();
     <!-- SweetAlert2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <!-- Custom Style CSS -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=<?php echo filemtime('css/style.css'); ?>">
 </head>
 <body>
 
@@ -51,10 +51,10 @@ $settings = getSystemSettings();
                                 <span class="text-white fw-bold" id="labelSuhuMaks"><?php echo htmlspecialchars($settings['suhu_maks']); ?> °C</span>
                             </label>
                             <div class="input-group">
-                                <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-thermometer-high"></i></span>
+                                <span class="input-group-text"><i class="bi bi-thermometer-high"></i></span>
                                 <input type="number" step="0.1" class="form-control glass-input" id="inputSuhuMaks" name="suhu_maks" 
                                        value="<?php echo htmlspecialchars($settings['suhu_maks']); ?>" required>
-                                <span class="input-group-text bg-dark border-secondary text-muted">°C</span>
+                                <span class="input-group-text">°C</span>
                             </div>
                             <div class="form-text text-muted">Jika suhu di atas nilai ini, Kipas Exhaust akan mati paksa untuk pendinginan demi keamanan daun.</div>
                         </div>
@@ -66,10 +66,10 @@ $settings = getSystemSettings();
                                 <span class="text-white fw-bold" id="labelHumMaks"><?php echo htmlspecialchars($settings['hum_maks']); ?> %RH</span>
                             </label>
                             <div class="input-group">
-                                <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-droplet-fill"></i></span>
+                                <span class="input-group-text"><i class="bi bi-droplet-fill"></i></span>
                                 <input type="number" step="0.1" class="form-control glass-input" id="inputHumMaks" name="hum_maks" 
                                        value="<?php echo htmlspecialchars($settings['hum_maks']); ?>" required>
-                                <span class="input-group-text bg-dark border-secondary text-muted">%RH</span>
+                                <span class="input-group-text">%RH</span>
                             </div>
                             <div class="form-text text-muted">Batas atas kelembapan udara. Jika kelembapan melebihi nilai ini, exhaust menyala untuk membuang uap air.</div>
                         </div>
@@ -81,10 +81,10 @@ $settings = getSystemSettings();
                                 <span class="text-white fw-bold" id="labelHumMin"><?php echo htmlspecialchars($settings['hum_min']); ?> %RH</span>
                             </label>
                             <div class="input-group">
-                                <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-droplet"></i></span>
+                                <span class="input-group-text"><i class="bi bi-droplet"></i></span>
                                 <input type="number" step="0.1" class="form-control glass-input" id="inputHumMin" name="hum_min" 
                                        value="<?php echo htmlspecialchars($settings['hum_min']); ?>" required>
-                                <span class="input-group-text bg-dark border-secondary text-muted">%RH</span>
+                                <span class="input-group-text">%RH</span>
                             </div>
                             <div class="form-text text-muted">Target kelembapan kering. Jika kelembapan di bawah nilai ini, exhaust mati agar panas matahari tertahan di dalam.</div>
                         </div>
@@ -113,7 +113,7 @@ $settings = getSystemSettings();
                                 <span>SSID WiFi</span>
                             </label>
                             <div class="input-group">
-                                <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-router"></i></span>
+                                <span class="input-group-text"><i class="bi bi-router"></i></span>
                                 <input type="text" class="form-control glass-input" id="inputWifiSSID" name="wifi_ssid" 
                                        value="<?php echo htmlspecialchars($settings['wifi_ssid']); ?>" required disabled>
                             </div>
@@ -125,7 +125,7 @@ $settings = getSystemSettings();
                                 <span>Password WiFi</span>
                             </label>
                             <div class="input-group">
-                                <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-key-fill"></i></span>
+                                <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
                                 <input type="password" class="form-control glass-input" id="inputWifiPassword" name="wifi_password" 
                                        value="<?php echo htmlspecialchars($settings['wifi_password']); ?>" required disabled>
                                 <button class="btn btn-outline-secondary" type="button" id="btnToggleWifiPass" onclick="toggleWifiPasswordVisibility()" style="border: 1px solid var(--border-glass);"><i class="bi bi-eye-slash"></i></button>
@@ -186,7 +186,7 @@ $settings = getSystemSettings();
     <!-- Script JavaScript Bootstrap, SweetAlert2, and AJAX -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=<?php echo filemtime('js/main.js'); ?>"></script>
 
     <script>
     // Menyimpan Pengaturan menggunakan AJAX POST ke API

@@ -10,7 +10,11 @@ CREATE TABLE IF NOT EXISTS `sensor_log` (
   `temperature` FLOAT NOT NULL,
   `humidity` FLOAT NOT NULL,
   `sht_temperature` FLOAT NOT NULL,
-  `exhaust` TINYINT(1) NOT NULL DEFAULT 0, -- 0: OFF, 1: ON
+  `exhaust` TINYINT(1) NOT NULL DEFAULT 0, -- 0: OFF, 1: ON (Fallback/Logical OR)
+  `exhaust_1` TINYINT(1) NOT NULL DEFAULT 0, -- 0: OFF, 1: ON
+  `exhaust_2` TINYINT(1) NOT NULL DEFAULT 0, -- 0: OFF, 1: ON
+  `exhaust_3` TINYINT(1) NOT NULL DEFAULT 0, -- 0: OFF, 1: ON
+  `exhaust_4` TINYINT(1) NOT NULL DEFAULT 0, -- 0: OFF, 1: ON
   `wifi` INT NOT NULL, -- RSSI (dBm)
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -44,5 +48,9 @@ INSERT INTO `settings` (`key_name`, `value_val`) VALUES
 ('hum_maks', '60.0'),
 ('hum_min', '50.0'),
 ('control_mode', 'AUTO'),
-('exhaust_control', 'OFF')
+('exhaust_control', 'OFF'),
+('exhaust_1_control', 'OFF'),
+('exhaust_2_control', 'OFF'),
+('exhaust_3_control', 'OFF'),
+('exhaust_4_control', 'OFF')
 ON DUPLICATE KEY UPDATE `value_val` = VALUES(`value_val`);
