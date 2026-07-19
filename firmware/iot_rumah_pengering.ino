@@ -31,7 +31,7 @@
 // ============================================
 // KONFIGURASI WIFI & SERVER IOT
 // ============================================
-#define WIFI_SSID "rifat"
+#define WIFI_SSID "beneng"
 #define WIFI_PASS "12345678"
 #define SERVER_URL "https://beneng.jeptira.id/api/receive_sensor.php" // Ganti dengan IP server Anda
 

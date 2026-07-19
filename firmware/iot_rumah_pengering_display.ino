@@ -20,7 +20,7 @@
 // ============================================================
 // KONFIGURASI WiFi — GANTI SESUAI JARINGAN ANDA
 // ============================================================
-const char* wifi_ssid     = "rifat";
+const char* wifi_ssid     = "beneng";
 const char* wifi_password = "12345678";
 
 Preferences preferences;
